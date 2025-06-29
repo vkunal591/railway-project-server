@@ -1,0 +1,47 @@
+{
+  "name": "skyfield-node-api",
+  "version": "1.0.0",
+  "description": "Sky Field Backend",
+  "homepage": "https://github.com/volvrit1/skyfield-node-api#readme",
+  "bugs": {
+    "url": "https://github.com/volvrit1/skyfield-node-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/volvrit1/skyfield-node-api.git"
+  },
+  "license": "ISC",
+  "author": "Deepak Singh, Kunal Verma",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon"
+  },
+  "imports": {
+    "#root/*": "./*.js",
+    "#libs/*": "./src/libs/*.lib.js",
+    "#utils/*": "./src/utils/*.util.js",
+    "#routes/*": "./src/routes/*.route.js",
+    "#controllers/*": "./src/controllers/*.controller.js",
+    "#services/*": "./src/services/*.service.js",
+    "#configs/*": "./src/configs/*.config.js",
+    "#models/*": "./src/models/*.model.js",
+    "#middlewares/*": "./src/middlewares/*.middleware.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcryptjs": "^3.0.0",
+    "cls-hooked": "^4.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "envalid": "^8.0.0",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.1",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.5"
+  }
+}
