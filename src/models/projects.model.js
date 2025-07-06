@@ -17,15 +17,21 @@ const projectSchema = new BaseSchema({
       required: true,
     },
   },
-
+  
   address: { type: String },
   country: { type: String },
   city: { type: String },
 
   status: {
     type: String,
-    enum: ['active', 'completed', 'hold'],
-    default: 'active',
+    enum: [
+      'not_started',
+      'in_progress',
+      'on_hold',
+      'completed',
+      'cancelled'
+    ],
+    default: 'not_started',
   },
 
   budget: { type: Number },

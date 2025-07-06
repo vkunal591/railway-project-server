@@ -9,6 +9,7 @@ class Service {
   }
 
   static async get(id, filters = {}) {
+    console.log(id)
     if (!id) {
       return await this.Model.findAll(filters);
     }

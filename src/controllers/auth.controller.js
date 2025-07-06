@@ -19,6 +19,7 @@ function decodeToken(token) {
 export const getUser = asyncHandler(async function (req, res, _next) {
   const { id } = req.params;
   const token = req.headers.authorization?.split(" ")[1];
+  console.log(token)
   if (!token) {
     return ('No token provided');
   }
@@ -31,6 +32,39 @@ export const getUser = asyncHandler(async function (req, res, _next) {
   const { password, ...userDataWithoutPassword } = user._doc;
   sendResponse(httpStatus.OK, res, userDataWithoutPassword, "User fetched successfully");
 });
+
+export const getAllUsers = asyncHandler(async function (req, res, _next) {
+  const token = req.headers.authorization?.split(" ")[1];
+  const { id } = req.params;
+
+  if (!token) {
+    return res.status(httpStatus.UNAUTHORIZED).json({ message: "No token provided" });
+  }
+
+  let decoded;
+  try {
+    decoded = decodeToken(token); // Ensure this uses the correct JWT_SECRET
+  } catch (err) {
+    return res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid token" });
+  }
+
+  // Simulate req.user since you're not using auth middleware
+  const currentUser = {
+    id: decoded.id,
+    role: decoded.role,
+  };
+
+  if (id) {
+    const user = await UserService.get(id);
+    const { password, ...userDataWithoutPassword } = user._doc;
+    sendResponse(httpStatus.OK, res, userDataWithoutPassword, "User fetched successfully");
+    return
+  }
+  const response = await UserService.getAllUsers(currentUser);
+  return sendResponse(httpStatus.OK, res, response, "User fetched successfully");
+
+});
+
 
 export const register = asyncHandler(async function (req, res, _next) {
   const newUser = await UserService.register(req.body);
@@ -50,7 +84,7 @@ export const login = asyncHandler(async function (req, res, _next) {
 });
 
 export const updateUser = asyncHandler(async function (req, res, _next) {
-  const { id } = req.params;  
+  const { id } = req.params;
   const updatedUser = await UserService.update(id, req.body);
   sendResponse(httpStatus.OK, res, updatedUser, "User updated successfully");
 });

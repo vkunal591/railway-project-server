@@ -2,15 +2,15 @@ import User from "#models/user";
 import Service from "#services/base";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { session } from "#middlewares/session";
+import { session, setSessionData } from "#middlewares/session";
 import httpStatus from "#utils/httpStatus";
 
 class UserService extends Service {
   static Model = User;
 
   static async register(data) {
-    const { name, email, password, role, profilePic, mobileNo } = data;
-    let user = await this.Model.findOne({ mobileNo });
+    const { name, email, password, role, profilePic } = data;
+    let user = await this.Model.findOne({ email });
     if (user)
       return {
         httpStatus: httpStatus.CONFLICT,
@@ -26,10 +26,9 @@ class UserService extends Service {
       password: hashedPassword,
       role,
       profilePic,
-      mobileNo,
     });
     await user.save();
-
+    setSessionData("user", user)
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -49,10 +48,11 @@ class UserService extends Service {
   }
 
   static async login(data) {
-    const { mobileNo, email, password } = data;
+    const { email, password } = data;
+    console.log(email, password)
     const user = await this.Model.findOne({
       $or: [
-        { mobileNo },
+        // { mobileNo },
         { email }
       ]
     });
@@ -70,8 +70,7 @@ class UserService extends Service {
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
-    // session.set("user", user);
-
+    session.set("user", user);
     return {
       token,
       user: {
@@ -79,10 +78,35 @@ class UserService extends Service {
         name: user.name,
         email: user.email,
         role: user.role,
-        mobileNo: user.mobileNo
       },
     };
   }
+
+
+
+  static async getAllUsers(currentUser) {
+    // Check if current user has permission
+    if (!['admin', 'manager'].includes(currentUser.role)) {
+      return {
+        httpStatus: httpStatus.FORBIDDEN,
+        message: "You are not authorized to access this resource",
+      };
+    }
+
+    try {
+      const users = await this.Model.find({}, "-password"); // Exclude password
+      return {
+        users,
+      };
+    } catch (err) {
+      return {
+        httpStatus: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Failed to fetch users",
+        error: err.message,
+      };
+    }
+  }
+
 }
 
 export default UserService;
