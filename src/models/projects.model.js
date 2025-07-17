@@ -2,22 +2,29 @@ import mongoose from "mongoose";
 import BaseSchema from "#models/base";
 import { saveFile } from "#utils/uploadFile";
 
+const { Schema } = mongoose;
+
+const geoPointSchema = new Schema({
+  type: {
+    type: String,
+    enum: ['Point'],
+    required: true,
+    default: 'Point',
+  },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    required: true,
+  },
+}, { _id: false }); // Prevents creation of subdocument _id fields
+
 const projectSchema = new BaseSchema({
   title: { type: String, required: true },
   description: { type: String },
 
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      default: 'Point',
-    },
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      required: true,
-    },
-  },
-  
+  // Separate geospatial fields
+  startLocation: { type: geoPointSchema, required: true },
+  endLocation: { type: geoPointSchema, required: true },
+
   address: { type: String },
   country: { type: String },
   city: { type: String },
@@ -38,17 +45,19 @@ const projectSchema = new BaseSchema({
   startDate: { type: Date },
   endDate: { type: Date },
 
-  tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
-  manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  team: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
+  manager: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  team: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  assets: [{ type: Schema.Types.ObjectId, ref: 'Asset' }],
 
   images: [{ type: String }],
 });
 
-// Add 2dsphere index for geospatial queries
-projectSchema.index({ location: '2dsphere' });
+// Add geospatial indexes
+projectSchema.index({ startLocation: "2dsphere" });
+projectSchema.index({ endLocation: "2dsphere" });
 
-// Save uploaded files if needed
+// Pre-save hook for file handling
 projectSchema.pre("save", saveFile);
 
 export default mongoose.model("Project", projectSchema);
