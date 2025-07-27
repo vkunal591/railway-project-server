@@ -39,7 +39,8 @@ const assetSchema = new BaseSchema({
   },
 
   image: [{
-    type: String, 
+    type: String,
+    file: true
   }],
 });
 

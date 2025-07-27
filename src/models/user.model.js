@@ -11,12 +11,12 @@ const userSchema = new BaseSchema({
   landMark: { type: String },
   state: { type: String },
   country: { type: String },
-  pincode: { type: String },
+  pincode: { type: String },  
   isActive: {
     type: String,
     default: true,
   },
-  password: {
+  password: { 
     type: String,
     required: true,
   },

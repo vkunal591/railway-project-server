@@ -27,6 +27,7 @@ class UserService extends Service {
       role,
       profilePic,
     });
+    console.log(user)
     await user.save();
     setSessionData("user", user)
     const token = jwt.sign(

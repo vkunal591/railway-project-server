@@ -10,6 +10,11 @@ export const get = asyncHandler(async function (req, res, _next) {
   sendResponse(httpStatus.OK, res, data, "Record fetched successfully");
 });
 
+export const listAssets = asyncHandler(async (req, res) => {
+  const data = await AssetsService.findAllAssets(req.query);
+  sendResponse(httpStatus.OK, res, data, "Assets fetched successfully");
+});
+
 export const create = asyncHandler(async function (req, res, _next) {
   const createdDoc = await AssetsService.create(req.body);
   sendResponse(

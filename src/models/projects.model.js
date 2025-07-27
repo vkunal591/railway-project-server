@@ -49,8 +49,7 @@ const projectSchema = new BaseSchema({
   manager: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   team: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   assets: [{ type: Schema.Types.ObjectId, ref: 'Asset' }],
-
-  images: [{ type: String }],
+  images: [{ type: String, file: true }]  ,
 });
 
 // Add geospatial indexes

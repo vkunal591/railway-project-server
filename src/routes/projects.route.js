@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { get, create, update, deleteData } from "#controllers/projects";
+import { get, create, update, deleteData, search } from "#controllers/projects";
 import { authentication, authorization } from "#middlewares/auth";
 
 const router = Router();
 
+router.route('/search', search)
 router
   .route("/:id?")
   .get(get)
