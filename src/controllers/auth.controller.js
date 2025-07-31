@@ -83,6 +83,12 @@ export const login = asyncHandler(async function (req, res, _next) {
   sendResponse(status, res, { token, user: data }, message);
 });
 
+export const resetPasswordByEmail = asyncHandler(async function (req, res, _next) {
+  const { email } = req.body;
+  const user = await UserService.resetPasswordByEmail(email);
+  sendResponse(httpStatus.OK, res, user, "User updated successfully");
+});
+
 export const updateUser = asyncHandler(async function (req, res, _next) {
   const { id } = req.params;
   const updatedUser = await UserService.update(id, req.body);

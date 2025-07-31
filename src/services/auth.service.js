@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { session, setSessionData } from "#middlewares/session";
 import httpStatus from "#utils/httpStatus";
+import { sendEmail } from "#utils/mail";
+import crypto from 'crypto';
 
 class UserService extends Service {
   static Model = User;
@@ -81,6 +83,51 @@ class UserService extends Service {
         role: user.role,
       },
     };
+  }
+
+
+  static async resetPasswordByEmail(email) {
+    const user = await this.Model.findOne({ email });
+
+    if (!user) {
+      return {
+        httpStatus: httpStatus.NOT_FOUND,
+        message: "User not found",
+      };
+    }
+
+    // Generate random password (10 characters)
+    const newPassword = crypto.randomBytes(5).toString("hex");
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Save the new password
+    user.password = hashedPassword;
+    await user.save();
+
+    const emailHtml = `
+    <p>Hello <strong>${user.name}</strong>,</p>
+    <p>Your password has been reset. Here is your new temporary password:</p>
+    <p><strong>${newPassword}</strong></p>
+    <p>Please log in and change your password as soon as possible.</p>
+    <p>Thanks,<br>${process.env.APP_NAME || 'Your App Team'}</p>
+  `;
+
+    try {
+      await sendEmail(user.email, "Password Reset Request", emailHtml);
+      return {
+        success: true,
+        message: "A new password has been sent to your email address.",
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Failed to send email.",
+        error: error.message,
+      };
+    }
   }
 
 
