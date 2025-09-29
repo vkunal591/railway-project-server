@@ -9,9 +9,10 @@ import globalErrorHandler from "#utils/error";
 import path from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "#middlewares/bodyParser";
+import serverless from "serverless-http"; // ✅ NEW
 
-const __filename = fileURLToPath(import.meta.url); // Get the file path
-const __dirname = path.dirname(__filename); // Get the directory path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const server = express();
 
@@ -25,7 +26,11 @@ server.use(sessionMiddleware);
 server.use("/api", router);
 server.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 server.use(globalErrorHandler);
-server.get('/', (req, res) => {
+
+// Simple route
+server.get("/", (req, res) => {
   res.json({ message: "Hello from Express on Vercel!" });
 });
-export default server;
+
+// ✅ EXPORT serverless handler for Vercel
+export const handler = serverless(server);
