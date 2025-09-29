@@ -25,5 +25,7 @@ server.use(sessionMiddleware);
 server.use("/api", router);
 server.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 server.use(globalErrorHandler);
-
+server.get('/', (req, res) => {
+  res.json({ message: "Hello from Express on Vercel!" });
+});
 export default server;
